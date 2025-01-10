@@ -1,22 +1,23 @@
 import { View, Image, StyleSheet, Text } from "react-native";
+import { Product } from "../models/Product";
 
-const ProductCell = () => {
+type ProductCellProps = {
+  product: Product;
+};
+
+const ProductCell = (props: ProductCellProps) => {
   return (
     <View style={styles.container}>
       <Image
         style={styles.imageStyle}
         source={{
-          uri: "https://upload.wikimedia.org/wikipedia/commons/4/43/Bonnet_macaque_%28Macaca_radiata%29_Photograph_By_Shantanu_Kuveskar.jpg",
+          uri: props.product.imageURL,
         }}
       />
       <View style={styles.textContainer}>
-        <Text>Camiseta </Text>
-        <Text>
-          {
-            "Descrição: Camiseta básica de algodão, confortável e leve, perfeita para o dia a dia."
-          }
-        </Text>
-        <Text>Quantidade: 8 </Text>
+        <Text>{props.product.name} </Text>
+        <Text>{props.product.description}</Text>
+        <Text>{props.product.quantity}</Text>
       </View>
     </View>
   );
