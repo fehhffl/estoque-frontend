@@ -1,6 +1,6 @@
 type Product = {
   id: string;
-  imageURL: string;
+  imageBlob: string;
   name: string;
   description: string;
   quantity: number;

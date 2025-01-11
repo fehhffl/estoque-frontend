@@ -14,6 +14,7 @@
     "noEmit": true,
     "types": ["node"],
     "baseUrl": ".",
+    "typeRoots": ["./types", "./node_modules/@types"],
     "paths": {
       "*": ["node_modules/*"]
     }

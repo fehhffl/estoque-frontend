@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 import { ProductListScreen } from "./screens/ProductListScreen";
+import { Register } from "./screens/Register";
 
 export default function App() {
   return (

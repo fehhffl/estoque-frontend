@@ -11,7 +11,7 @@ const ProductCell = (props: ProductCellProps) => {
       <Image
         style={styles.imageStyle}
         source={{
-          uri: props.product.imageURL,
+          uri: props.product.imageBlob,
         }}
       />
       <View style={styles.textContainer}>
