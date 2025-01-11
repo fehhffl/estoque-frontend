@@ -5,19 +5,19 @@ type ProductCellProps = {
   product: Product;
 };
 
-const ProductCell = (props: ProductCellProps) => {
+const ProductCell = ({ product }: ProductCellProps) => {
   return (
     <View style={styles.container}>
       <Image
         style={styles.imageStyle}
         source={{
-          uri: props.product.imageBlob,
+          uri: product.imageBlob,
         }}
       />
       <View style={styles.textContainer}>
-        <Text>{props.product.name} </Text>
-        <Text>{props.product.description}</Text>
-        <Text>{props.product.quantity}</Text>
+        <Text>{product.name} </Text>
+        <Text>{product.description}</Text>
+        <Text>{product.quantity}</Text>
       </View>
     </View>
   );
