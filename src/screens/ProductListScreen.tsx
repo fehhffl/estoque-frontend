@@ -29,7 +29,7 @@ const ProductListScreen = () => {
 const styles = StyleSheet.create({
   safeAreaStyle: {
     flex: 1,
-    backgroundColor: "red",
+    backgroundColor: "white",
   },
 });
 export { ProductListScreen };

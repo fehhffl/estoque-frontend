@@ -1,12 +1,15 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
-import { RegisterScreen } from "./screens/RegisterScreen";
+import { NavigationContainer } from "@react-navigation/native";
+import { RootStackNavigator } from "./navigation/RootStackNavigator";
 
 export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <RegisterScreen />
+      <NavigationContainer>
+        <RootStackNavigator/>
+      </NavigationContainer>
     </View>
   );
 }

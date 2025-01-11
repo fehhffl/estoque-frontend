@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Text,
   View,
@@ -11,9 +11,16 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { commonStyles } from "../styles/commonStyles";
 import { PrimaryButton } from "../components/PrimaryButton";
+import { useNavigation } from "@react-navigation/native";
+import { RootNavigationProps } from "../navigation/RootStackNavigator";
 
 const LoginScreen = () => {
   const [isSecured, setIsSecured] = useState(true);
+  const navigator = useNavigation<RootNavigationProps>();
+
+  const handleLoginButtonPress = () => {
+    navigator.navigate("RegisterScreen");
+  };
 
   return (
     <SafeAreaView style={commonStyles.safeAreaStyle}>
@@ -42,8 +49,8 @@ const LoginScreen = () => {
           </View>
         </View>
         <View style={styles.buttonContainer}>
-          <PrimaryButton text={"Entrar"} />
-          <PrimaryButton text={"Registrar"} />
+          <PrimaryButton text={"Entrar"} onPress={handleLoginButtonPress} />
+          <PrimaryButton text={"Registrar"} onPress={handleLoginButtonPress} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -92,6 +99,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: "100%",
+    gap: 16,
     alignItems: "center",
   },
 });

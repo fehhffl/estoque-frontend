@@ -2,11 +2,12 @@ import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
 type PrimaryButtonsProps = {
   text: string;
+  onPress: () => void;
 };
 
-const PrimaryButton = ({ text }: PrimaryButtonsProps) => {
+const PrimaryButton = ({ text, onPress }: PrimaryButtonsProps) => {
   return (
-    <TouchableOpacity style={styles.borderButton}>
+    <TouchableOpacity style={styles.borderButton} onPress={onPress}>
       <Text style={styles.borderButtonText}>{text}</Text>
     </TouchableOpacity>
   );
