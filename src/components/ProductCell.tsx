@@ -1,5 +1,6 @@
 import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Product } from "../models/Product";
+import { EXPO_BASE_URL } from "@env";
 
 type ProductCellProps = {
   product: Product;
@@ -16,7 +17,11 @@ const ProductCell = ({ product, onPress }: ProductCellProps) => {
     >
       <Image
         style={styles.imageStyle}
-        source={product.image ? { uri: product.image } : undefined}
+        source={{
+          uri: `${EXPO_BASE_URL}/products/${
+            product.id
+          }/image?data_carregada=${Date.now()}`,
+        }} // Como data_carregada muda toda vez, isso força a imagem a ser recarregada quando o usuário volta pra tela
       />
       <View style={styles.textContainer}>
         <Text>{product.name} </Text>
@@ -31,6 +36,7 @@ const styles = StyleSheet.create({
   imageStyle: {
     height: 100,
     width: 100,
+    borderRadius: 8,
   },
   container: {
     flexDirection: "row",

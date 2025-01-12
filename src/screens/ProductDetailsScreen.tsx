@@ -1,5 +1,4 @@
 import {
-  KeyboardAvoidingView,
   SafeAreaView,
   StyleSheet,
   Image,
@@ -10,84 +9,163 @@ import {
   Alert,
 } from "react-native";
 import { commonStyles } from "../styles/commonStyles";
-import { RouteProp, useRoute } from "@react-navigation/native";
-import { RootParamList } from "../navigation/RootStackNavigator";
-import { useState } from "react";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import {
+  RootNavigationProps,
+  RootParamList,
+} from "../navigation/RootStackNavigator";
+import { useRef, useState } from "react";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
-import { pickImage } from "../services/imageService";
-import { updateProduct } from "../services/api";
+import * as ImagePicker from "expo-image-picker";
+import { updateProductImage, updateProductInfo } from "../services/api";
+import { EXPO_BASE_URL } from "@env";
+import { isAxiosError } from "axios";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const ProductDetailsScreen = () => {
+  const navigation = useNavigation<RootNavigationProps>();
   const route = useRoute<RouteProp<RootParamList, "ProductDetailsScreen">>();
   const { product } = route.params;
-  const [title, setTitle] = useState(product.name);
+  const [imageBase64FromImgPicker, setImageBase64FromImgPicker] = useState<
+    string | null
+  >(null); // Quando a imagem foi escolhida do dispositivo
+  const [productName, setProductName] = useState(product.name);
   const [description, setDescription] = useState(product.description);
-  const [image, setImage] = useState(product.image);
-  const [pickedImageUri, setPickedImageUri] = useState<string | null>(
-    product.image
-  );
-  const [uploadedProductId, setUploadedProductId] = useState<number | null>(
-    null
-  );
-  const [downloadedImageUri, setDownloadedImageUri] = useState<string | null>(
-    null
-  );
+  const hasChangedImage = useRef(false);
+  const productNameInputRef = useRef<TextInput>(null);
+  const descriptionInputRef = useRef<TextInput>(null);
+
+  const handlePickImage = async () => {
+    try {
+      // Pede permissão para acessar galeria
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        base64: true,
+        quality: 1,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        // Pega a base64 pura da imagem
+        const base64String = result.assets[0].base64;
+        setImageBase64FromImgPicker(base64String || null);
+        hasChangedImage.current = true;
+      }
+    } catch (error) {
+      console.error("Erro ao selecionar imagem:", error);
+      Alert.alert("Erro", "Não foi possível selecionar a imagem");
+    }
+  };
 
   const handleDeleteButtonPress = () => {};
 
   const handleSaveButtonPress = async () => {
-    const updatedProduct = {
-      id: product.id,
-      name: title,
-      description,
-      image: pickedImageUri,
-      quantity: product.quantity,
-    };
     try {
-      await updateProduct(updatedProduct);
+      // Atualiza a imagem primeiro, caso tenha sido alterada,
+      // para que se der erro, não atualiza as informações do produto ainda
+      if (hasChangedImage.current && imageBase64FromImgPicker) {
+        await updateProductImage(product.id, imageBase64FromImgPicker);
+      }
+
+      await updateProductInfo({
+        id: product.id,
+        name: productName,
+        description,
+        value: product.value,
+        quantity: product.quantity,
+      });
+
+      Alert.alert("Produto atualizado com sucesso!");
+      navigation.goBack();
     } catch (error) {
       console.error(error);
-      Alert.alert("Erro", "Erro ao atualizar o produto.");
+
+      if (isAxiosError(error) && error.response?.status === 413) {
+        // 413 = Dados enviados muito grandes
+        Alert.alert(
+          "Erro",
+          "Imagem muito grande. Por favor, escolha uma menor (10 MB max)."
+        );
+        return;
+      }
+
+      Alert.alert("Erro", "Erro ao atualizar produto.");
     }
   };
 
-  const handlePickImage = async () => {
-    const uri = await pickImage();
-    if (uri) {
-      setPickedImageUri(uri);
-    }
+  const focusProductNameInput = () => {
+    productNameInputRef.current?.focus();
+  };
+
+  const focusDescriptionInput = () => {
+    descriptionInputRef.current?.focus();
   };
 
   return (
     <SafeAreaView style={commonStyles.safeAreaStyle}>
-      <KeyboardAvoidingView style={styles.container}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollViewContentContainerStyle}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.sectionStyle}>
-          <TouchableOpacity onPress={handlePickImage} style={styles.imageStyle}>
-            <Image
-              style={styles.imageStyle}
-              source={{ uri: pickedImageUri ?? "" }}
-            />
+          {/* Imagem */}
+          <TouchableOpacity
+            onPress={handlePickImage}
+            style={styles.imageContainerButtonStyle}
+          >
+            {/* Se o usuário escolher da galeria, mostramos a base64 local; caso contrário, mostramos a do servidor. */}
+            {imageBase64FromImgPicker ? (
+              <Image
+                style={styles.imageStyle}
+                source={{
+                  uri: `data:image/jpeg;base64,${imageBase64FromImgPicker}`,
+                }}
+              />
+            ) : (
+              <Image
+                style={styles.imageStyle}
+                source={{
+                  uri: `${EXPO_BASE_URL}/products/${product.id}/image`,
+                }}
+              />
+            )}
           </TouchableOpacity>
-          <View style={styles.textInputContainerStyle}>
+
+          {/* Nome do produto */}
+          <TouchableOpacity
+            style={styles.textInputContainerStyle}
+            onPress={focusProductNameInput}
+          >
             <TextInput
-              style={styles.titleTextInputStyle}
-              value={title}
-              onChangeText={setTitle}
+              ref={productNameInputRef}
+              style={styles.productNameInputStyle}
+              value={productName}
+              onChangeText={setProductName}
               placeholder="Nome do Produto"
             />
             <MaterialIcons name={"edit"} size={24} color="gray" />
-          </View>
-          <View style={styles.textInputContainerStyle}>
+          </TouchableOpacity>
+
+          {/* Descrição */}
+          <TouchableOpacity
+            style={styles.textInputContainerStyle}
+            onPress={focusDescriptionInput}
+          >
             <TextInput
+              ref={descriptionInputRef}
               style={styles.textInputStyle}
               value={description}
               onChangeText={setDescription}
-              placeholder="Descriçao do Produto"
+              placeholder="Descrição do Produto"
+              multiline
             />
             <MaterialIcons name={"edit"} size={16} color="gray" />
-          </View>
+          </TouchableOpacity>
 
+          {/* Valor */}
+
+          {/* Quantidade */}
           <Text style={styles.staticText}>Quantidade: {product.quantity}</Text>
         </View>
         <View style={styles.sectionStyle}>
@@ -95,11 +173,11 @@ const ProductDetailsScreen = () => {
           <PrimaryButton
             text={"Deletar"}
             onPress={handleDeleteButtonPress}
-            style={{ backgroundColor: "#ffbbbb", borderWidth: 0 }}
-            textStyle={{ color: "white" }}
+            style={styles.deleteButtonStyle}
+            textStyle={styles.deleteButtonTextStyle}
           />
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
@@ -116,8 +194,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
   },
-  container: {
-    flex: 1,
+  scrollViewContentContainerStyle: {
+    flexGrow: 1,
     padding: 24,
     gap: 16,
     alignItems: "center",
@@ -129,6 +207,10 @@ const styles = StyleSheet.create({
     height: 300,
     borderRadius: 4,
   },
+  imageContainerButtonStyle: {
+    width: "100%",
+    borderRadius: 4,
+  },
   textInputStyle: {
     borderColor: "gray",
     paddingVertical: 4,
@@ -138,11 +220,18 @@ const styles = StyleSheet.create({
     width: "100%",
     fontSize: 15,
   },
-  titleTextInputStyle: {
+  productNameInputStyle: {
     borderColor: "gray",
     paddingVertical: 4,
     fontSize: 25,
     fontWeight: "bold",
+  },
+  deleteButtonStyle: {
+    backgroundColor: "#ffbbbb",
+    borderWidth: 0,
+  },
+  deleteButtonTextStyle: {
+    color: "white",
   },
 });
 

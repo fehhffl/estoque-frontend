@@ -4,7 +4,6 @@ import {
   View,
   StyleSheet,
   SafeAreaView,
-  KeyboardAvoidingView,
   TextInput,
   TouchableOpacity,
 } from "react-native";
@@ -17,91 +16,108 @@ import { login } from "../services/api";
 import { Alert } from "react-native";
 import { isAxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const LoginScreen = () => {
   const [isSecured, setIsSecured] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigator = useNavigation<RootNavigationProps>();
+  const navigation = useNavigation<RootNavigationProps>();
 
   const handleLoginButtonPress = async () => {
+    // TODO: Validar email e senha
     try {
       await login(email, password);
-      AsyncStorage.setItem("login", email); // salva local o usuario logado, para que na proxima vez nao precisa logar dnv.
-      navigator.navigate("ProductListScreen");
+      await AsyncStorage.setItem("login", email); // salva local o usuário logado, para que na proxima vez nao precisa logar dnv.
+
+      // Navega sem a possibilidade de voltar para a tela de login
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "ProductListScreen" }],
+      });
     } catch (error) {
       console.error(error);
       if (isAxiosError(error) && error.response?.status === 401) {
-        Alert.alert("Erro", "Usuario ou senha incorretos.");
+        Alert.alert("Erro", "Usuário ou senha incorretos.");
       } else {
-        // qualquer outro erro que nao tem relaçao com usuario e senha incorretos
+        // qualquer outro erro que nao tem relação com usuário e senha incorretos
         Alert.alert("Erro", "Erro ao fazer login.");
       }
     }
   };
 
   const handleRegisterButtonPress = () => {
-    navigator.navigate("RegisterScreen");
+    navigation.navigate("RegisterScreen");
   };
 
   return (
     <SafeAreaView style={commonStyles.safeAreaStyle}>
-      <KeyboardAvoidingView style={[commonStyles.container, { gap: 80 }]}>
-        <View style={styles.topView}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollViewContentContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.container}>
           <Text style={styles.titleText}>Bem-Vindo</Text>
-        </View>
-        <View style={styles.centerView}>
-          <TextInput
-            onChangeText={setEmail}
-            style={styles.textInput}
-            placeholder="E-mail"
-            value={email}
-          />
-          <View style={styles.passwordContainer}>
+          <View style={styles.textInputsContainer}>
             <TextInput
-              value={password}
-              onChangeText={setPassword}
-              style={styles.passwordInput}
-              placeholder="Senha"
-              secureTextEntry={isSecured}
+              onChangeText={setEmail}
+              style={styles.textInput}
+              placeholder="E-mail"
+              value={email}
+              autoCapitalize={"none"}
             />
-            <TouchableOpacity
-              style={styles.eyeButton}
-              onPress={() => setIsSecured((prev) => !prev)}
-            >
-              <MaterialIcons
-                name={isSecured ? "visibility-off" : "visibility"}
-                size={24}
-                color="gray"
+            <View style={styles.passwordContainer}>
+              <TextInput
+                value={password}
+                onChangeText={setPassword}
+                style={styles.passwordInput}
+                placeholder="Senha"
+                secureTextEntry={isSecured}
               />
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => setIsSecured((prev) => !prev)}>
+                <MaterialIcons
+                  name={isSecured ? "visibility-off" : "visibility"}
+                  size={24}
+                  color="gray"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.buttonContainer}>
+            <PrimaryButton text={"Entrar"} onPress={handleLoginButtonPress} />
+            <PrimaryButton
+              text={"Registrar"}
+              onPress={handleRegisterButtonPress}
+            />
           </View>
         </View>
-        <View style={styles.buttonContainer}>
-          <PrimaryButton text={"Entrar"} onPress={handleLoginButtonPress} />
-          <PrimaryButton
-            text={"Registrar"}
-            onPress={handleRegisterButtonPress}
-          />
-        </View>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    padding: 24,
+    gap: 24,
+    alignItems: "center",
+  },
+  scrollViewContentContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   topView: {
     justifyContent: "flex-start",
     alignItems: "center",
-    marginBottom: 20,
   },
   titleText: {
     fontSize: 30,
     fontWeight: "bold",
   },
-  centerView: {
+  textInputsContainer: {
     alignItems: "center",
-    gap: 20,
+    width: "100%",
+    gap: 24,
   },
   textInput: {
     borderRadius: 12,
@@ -110,7 +126,6 @@ const styles = StyleSheet.create({
     padding: 10,
     height: 40,
     width: "100%",
-    marginBottom: 15,
   },
   passwordContainer: {
     flexDirection: "row",
@@ -120,14 +135,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: "100%",
     paddingHorizontal: 10,
-    marginBottom: 15,
   },
   passwordInput: {
     flex: 1,
     height: 40,
-  },
-  eyeButton: {
-    marginLeft: 10,
   },
   buttonContainer: {
     width: "100%",
