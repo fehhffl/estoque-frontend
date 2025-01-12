@@ -16,9 +16,7 @@ const ProductCell = ({ product, onPress }: ProductCellProps) => {
     >
       <Image
         style={styles.imageStyle}
-        source={{
-          uri: product.image ?? "",
-        }}
+        source={product.image ? { uri: product.image } : undefined}
       />
       <View style={styles.textContainer}>
         <Text>{product.name} </Text>

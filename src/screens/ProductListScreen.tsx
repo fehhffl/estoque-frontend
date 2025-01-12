@@ -2,23 +2,33 @@ import { FlatList, SafeAreaView, StyleSheet } from "react-native";
 import { ProductCell } from "../components/ProductCell";
 import { Product } from "../models/Product";
 import { getProducts } from "../services/api";
-import { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useCallback, useState } from "react";
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
 import { RootNavigationProps } from "../navigation/RootStackNavigator";
 
 const ProductListScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const navigator = useNavigation<RootNavigationProps>();
+  const isFocused = useIsFocused();
 
   async function loadData() {
     const { data } = await getProducts();
-    console.log(JSON.stringify(data, null, 2));
     setProducts(data);
   }
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  // Recarrega os produtos toda vez que volta pra tela
+  useFocusEffect(
+    useCallback(() => {
+      // impede que load data seja chamada multiplas vezes (view will appear do swift)
+      if (isFocused) {
+        loadData();
+      }
+    }, [isFocused])
+  );
 
   const handleProductPress = (product: Product) => {
     navigator.navigate("ProductDetailsScreen", { product });
