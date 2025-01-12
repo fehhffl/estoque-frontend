@@ -12,6 +12,7 @@ const ProductListScreen = () => {
 
   async function loadData() {
     const { data } = await getProducts();
+    console.log(JSON.stringify(data, null, 2));
     setProducts(data);
   }
 

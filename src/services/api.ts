@@ -1,6 +1,6 @@
 import axios from "axios";
 import { EXPO_BASE_URL } from "@env";
-import bcrypt from "bcryptjs";
+import { Product } from "../models/Product";
 
 const api = axios.create({
   baseURL: EXPO_BASE_URL, // lembrar de colocar local host dps
@@ -21,4 +21,9 @@ const getProducts = () => {
   return api.get("/products");
 };
 
-export { register, getProducts, login };
+const updateProduct = (product: Product) => {
+  const body = product;
+  return api.put("/product/update/" + product.id, JSON.stringify(body));
+};
+
+export { register, getProducts, login, updateProduct };

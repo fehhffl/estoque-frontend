@@ -1,7 +1,6 @@
 import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
-  useAnimatedHeaderHeight,
 } from "@react-navigation/native-stack";
 import { LoginScreen } from "../screens/LoginScreen";
 import { RegisterScreen } from "../screens/RegisterScreen";
@@ -10,7 +9,6 @@ import { ProductDetailsScreen } from "../screens/ProductDetailsScreen";
 import { Product } from "../models/Product";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { RouteProp } from "@react-navigation/native";
 
 type RootParamList = {
   LoginScreen: undefined;
@@ -64,7 +62,10 @@ const RootStackNavigator = () => {
       <Stack.Screen
         name={"ProductDetailsScreen"}
         component={ProductDetailsScreen}
-        options={defaultScreenOptions}
+        options={{
+          ...defaultScreenOptions,
+          headerTitle: "Detalhes do Produto",
+        }}
       />
     </Stack.Navigator>
   );

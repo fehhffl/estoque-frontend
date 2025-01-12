@@ -48,7 +48,7 @@ const LoginScreen = () => {
     <SafeAreaView style={commonStyles.safeAreaStyle}>
       <KeyboardAvoidingView style={[commonStyles.container, { gap: 80 }]}>
         <View style={styles.topView}>
-          <Text style={styles.tittleText}>Bem-Vindo</Text>
+          <Text style={styles.titleText}>Bem-Vindo</Text>
         </View>
         <View style={styles.centerView}>
           <TextInput
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  tittleText: {
+  titleText: {
     fontSize: 30,
     fontWeight: "bold",
   },

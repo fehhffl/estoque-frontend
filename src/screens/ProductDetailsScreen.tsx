@@ -6,6 +6,8 @@ import {
   Text,
   TextInput,
   View,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
 import { commonStyles } from "../styles/commonStyles";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -13,28 +15,65 @@ import { RootParamList } from "../navigation/RootStackNavigator";
 import { useState } from "react";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
+import { pickImage } from "../services/imageService";
+import { updateProduct } from "../services/api";
 
 const ProductDetailsScreen = () => {
   const route = useRoute<RouteProp<RootParamList, "ProductDetailsScreen">>();
   const { product } = route.params;
-  const [tittle, setTittle] = useState(product.name);
+  const [title, setTitle] = useState(product.name);
   const [description, setDescription] = useState(product.description);
-  const [image, setImage] = useState(product.imageBlob);
+  const [image, setImage] = useState(product.image);
+  const [pickedImageUri, setPickedImageUri] = useState<string | null>(
+    product.image
+  );
+  const [uploadedProductId, setUploadedProductId] = useState<number | null>(
+    null
+  );
+  const [downloadedImageUri, setDownloadedImageUri] = useState<string | null>(
+    null
+  );
 
   const handleDeleteButtonPress = () => {};
 
-  const handleSaveButtonPress = () => {};
+  const handleSaveButtonPress = async () => {
+    const updatedProduct = {
+      id: product.id,
+      name: title,
+      description,
+      image: pickedImageUri,
+      quantity: product.quantity,
+    };
+    try {
+      await updateProduct(updatedProduct);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Erro ao atualizar o produto.");
+    }
+  };
+
+  const handlePickImage = async () => {
+    const uri = await pickImage();
+    if (uri) {
+      setPickedImageUri(uri);
+    }
+  };
 
   return (
     <SafeAreaView style={commonStyles.safeAreaStyle}>
       <KeyboardAvoidingView style={styles.container}>
         <View style={styles.sectionStyle}>
-          <Image style={styles.imageStyle} source={{ uri: image }} />
+          <TouchableOpacity onPress={handlePickImage} style={styles.imageStyle}>
+            <Image
+              style={styles.imageStyle}
+              source={{ uri: pickedImageUri ?? "" }}
+            />
+          </TouchableOpacity>
           <View style={styles.textInputContainerStyle}>
             <TextInput
-              style={styles.tittleTextInputStyle}
-              value={tittle}
-              onChangeText={setTittle}
+              style={styles.titleTextInputStyle}
+              value={title}
+              onChangeText={setTitle}
               placeholder="Nome do Produto"
             />
             <MaterialIcons name={"edit"} size={24} color="gray" />
@@ -99,7 +138,7 @@ const styles = StyleSheet.create({
     width: "100%",
     fontSize: 15,
   },
-  tittleTextInputStyle: {
+  titleTextInputStyle: {
     borderColor: "gray",
     paddingVertical: 4,
     fontSize: 25,
