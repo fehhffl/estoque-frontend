@@ -1,14 +1,28 @@
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+} from "react-native";
 
 type PrimaryButtonsProps = {
   text: string;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
   onPress: () => void;
 };
 
-const PrimaryButton = ({ text, onPress }: PrimaryButtonsProps) => {
+const PrimaryButton = ({
+  text,
+  onPress,
+  style,
+  textStyle,
+}: PrimaryButtonsProps) => {
   return (
-    <TouchableOpacity style={styles.borderButton} onPress={onPress}>
-      <Text style={styles.borderButtonText}>{text}</Text>
+    <TouchableOpacity style={[styles.borderButton, style]} onPress={onPress}>
+      <Text style={[styles.borderButtonText, textStyle]}>{text}</Text>
     </TouchableOpacity>
   );
 };

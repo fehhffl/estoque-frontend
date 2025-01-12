@@ -16,6 +16,7 @@ import { RootNavigationProps } from "../navigation/RootStackNavigator";
 import { login } from "../services/api";
 import { Alert } from "react-native";
 import { isAxiosError } from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = () => {
   const [isSecured, setIsSecured] = useState(true);
@@ -26,6 +27,7 @@ const LoginScreen = () => {
   const handleLoginButtonPress = async () => {
     try {
       await login(email, password);
+      AsyncStorage.setItem("login", email); // salva local o usuario logado, para que na proxima vez nao precisa logar dnv.
       navigator.navigate("ProductListScreen");
     } catch (error) {
       console.error(error);
