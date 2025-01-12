@@ -1,13 +1,19 @@
-import { View, Image, StyleSheet, Text } from "react-native";
+import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Product } from "../models/Product";
 
 type ProductCellProps = {
   product: Product;
+  onPress: (product: Product) => void;
 };
 
-const ProductCell = ({ product }: ProductCellProps) => {
+const ProductCell = ({ product, onPress }: ProductCellProps) => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      onPress={() => {
+        onPress(product);
+      }}
+      style={styles.container}
+    >
       <Image
         style={styles.imageStyle}
         source={{
@@ -19,7 +25,7 @@ const ProductCell = ({ product }: ProductCellProps) => {
         <Text>{product.description}</Text>
         <Text>{product.quantity}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

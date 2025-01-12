@@ -5,11 +5,14 @@ import {
 import { LoginScreen } from "../screens/LoginScreen";
 import { RegisterScreen } from "../screens/RegisterScreen";
 import { ProductListScreen } from "../screens/ProductListScreen";
+import { ProductDetailsScreen } from "../screens/ProductDetailsScreen";
+import { Product } from "../models/Product";
 
 type RootParamList = {
   LoginScreen: undefined;
   RegisterScreen: undefined;
   ProductListScreen: undefined;
+  ProductDetailsScreen: { product: Product };
 };
 
 type RootNavigationProps = NativeStackNavigationProp<
@@ -41,6 +44,11 @@ const RootStackNavigator = () => {
       <Stack.Screen
         name={"ProductListScreen"}
         component={ProductListScreen}
+        options={defaultScreenOptions}
+      />
+      <Stack.Screen
+        name={"ProductDetailsScreen"}
+        component={ProductDetailsScreen}
         options={defaultScreenOptions}
       />
     </Stack.Navigator>

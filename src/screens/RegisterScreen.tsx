@@ -1,4 +1,9 @@
-import { SafeAreaView, StyleSheet, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  SafeAreaView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { commonStyles } from "../styles/commonStyles";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { useNavigation } from "@react-navigation/native";
@@ -14,9 +19,9 @@ const RegisterScreen = () => {
   };
   return (
     <SafeAreaView style={commonStyles.safeAreaStyle}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container}>
         <PrimaryButton text={"Registrar"} onPress={handleRegisterButtonPress} />
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
