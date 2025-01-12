@@ -13,12 +13,32 @@ import { commonStyles } from "../styles/commonStyles";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { useNavigation } from "@react-navigation/native";
 import { RootNavigationProps } from "../navigation/RootStackNavigator";
+import { login } from "../services/api";
+import { Alert } from "react-native";
+import { isAxiosError } from "axios";
 
 const LoginScreen = () => {
   const [isSecured, setIsSecured] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigator = useNavigation<RootNavigationProps>();
 
-  const handleLoginButtonPress = () => {
+  const handleLoginButtonPress = async () => {
+    try {
+      await login(email, password);
+      navigator.navigate("ProductListScreen");
+    } catch (error) {
+      console.error(error);
+      if (isAxiosError(error) && error.response?.status === 401) {
+        Alert.alert("Erro", "Usuario ou senha incorretos.");
+      } else {
+        // qualquer outro erro que nao tem relaçao com usuario e senha incorretos
+        Alert.alert("Erro", "Erro ao fazer login.");
+      }
+    }
+  };
+
+  const handleRegisterButtonPress = () => {
     navigator.navigate("RegisterScreen");
   };
 
@@ -29,9 +49,16 @@ const LoginScreen = () => {
           <Text style={styles.tittleText}>Bem-Vindo</Text>
         </View>
         <View style={styles.centerView}>
-          <TextInput style={styles.textInput} placeholder="E-mail" />
+          <TextInput
+            onChangeText={setEmail}
+            style={styles.textInput}
+            placeholder="E-mail"
+            value={email}
+          />
           <View style={styles.passwordContainer}>
             <TextInput
+              value={password}
+              onChangeText={setPassword}
               style={styles.passwordInput}
               placeholder="Senha"
               secureTextEntry={isSecured}
@@ -50,7 +77,10 @@ const LoginScreen = () => {
         </View>
         <View style={styles.buttonContainer}>
           <PrimaryButton text={"Entrar"} onPress={handleLoginButtonPress} />
-          <PrimaryButton text={"Registrar"} onPress={handleLoginButtonPress} />
+          <PrimaryButton
+            text={"Registrar"}
+            onPress={handleRegisterButtonPress}
+          />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
