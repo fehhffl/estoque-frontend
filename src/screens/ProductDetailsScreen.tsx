@@ -59,32 +59,36 @@ const ProductDetailsScreen = () => {
     }
   };
 
-   const handleDeleteProduct = async (productId: string) => {
-     try {
+  const handleDeleteProduct = async (productId: string) => {
+    try {
       // Deleta o produto no backend.
-     await deleteProduct(product.id);
-     Alert.alert("Produto deletado", "O produto foi removido com sucesso.");
-     } catch(error) {
-      console.error(error)
-       Alert.alert("Erro", "Erro ao deletar produto.");
-     } 
-   };
+      await deleteProduct(product.id);
+      Alert.alert("Produto deletado", "O produto foi removido com sucesso.");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "ProductListScreen" }],
+      });
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Erro ao deletar produto.");
+    }
+  };
 
-   const confirmDeleteProduct = () => {
-     Alert.alert(
-       "Confirmar Exclusão",
-       "Tem certeza de que deseja deletar este produto?",
-       [
-         { text: "Cancelar", style: "cancel" }, 
-         {
-           text: "Deletar",
-           style: "destructive", 
-           onPress: () => handleDeleteProduct(product.id), 
-         },
-       ],
-       { cancelable: true }
-     );
-   };
+  const confirmDeleteProduct = () => {
+    Alert.alert(
+      "Confirmar Exclusão",
+      "Tem certeza de que deseja deletar este produto?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Deletar",
+          style: "destructive",
+          onPress: () => handleDeleteProduct(product.id),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   const handleSaveButtonPress = async () => {
     try {
