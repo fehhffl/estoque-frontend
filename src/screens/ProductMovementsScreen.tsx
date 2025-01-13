@@ -50,7 +50,7 @@ const ProductMovementsScreen = () => {
   const [modalType, setModalType] = useState<"entry" | "exit">("entry");
   const [inputQuantity, setInputQuantity] = useState<string>("");
 
-  // Load history from AsyncStorage
+  // carrega o historico do armazenamento local(async storage)
   useEffect(() => {
     const loadHistory = async () => {
       try {
@@ -68,7 +68,6 @@ const ProductMovementsScreen = () => {
     loadHistory();
   }, [product.id]);
 
-  // Save history to AsyncStorage
   const saveHistory = async (newHistory: History[]) => {
     try {
       await AsyncStorage.setItem(
@@ -94,9 +93,9 @@ const ProductMovementsScreen = () => {
       
       return;
     }
-    
+
     if (isNaN(delta)) {
-      return; // Ignore invalid input
+      return; // Ignora caso nao for um numero.
     }
 
     const updatedQuantity = currentQuantity + delta;
@@ -187,12 +186,12 @@ const ProductMovementsScreen = () => {
                 text="Confirmar"
                 style={{ width: "auto" }}
                 onPress={handleRegister}
-              ></PrimaryButton>
+              />
               <PrimaryButton
                 text="Cancelar"
                 style={{ width: "auto" }}
                 onPress={() => setModalVisible(false)}
-              ></PrimaryButton>
+              />
             </View>
           </View>
         </View>

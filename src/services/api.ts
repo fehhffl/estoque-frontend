@@ -24,6 +24,10 @@ const getProducts = () => {
   return api.get("/products");
 };
 
+const deleteProduct = (productId: string) => {
+  return api.delete(`/products/${productId}`)
+}
+
 const updateProductInfo = (product: Product) => {
   const body = product;
   return api.put(`/products/${product.id}`, JSON.stringify(body));
@@ -60,4 +64,5 @@ export {
   updateProductInfo,
   updateProductImage,
   getProductImage,
+  deleteProduct,
 };

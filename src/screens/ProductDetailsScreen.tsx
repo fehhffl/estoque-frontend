@@ -22,6 +22,7 @@ import { updateProductImage, updateProductInfo } from "../services/api";
 import { EXPO_BASE_URL } from "@env";
 import { isAxiosError } from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { deleteProduct } from "../services/api";
 
 const ProductDetailsScreen = () => {
   const navigation = useNavigation<RootNavigationProps>();
@@ -54,11 +55,36 @@ const ProductDetailsScreen = () => {
       }
     } catch (error) {
       console.error("Erro ao selecionar imagem:", error);
-      Alert.alert("Erro", "Não foi possível selecionar a imagem");
+      Alert.alert("Erro", "Não foi possível selecionar a imagem.");
     }
   };
 
-  const handleDeleteButtonPress = () => {};
+   const handleDeleteProduct = async (productId: string) => {
+     try {
+      // Deleta o produto no backend.
+     await deleteProduct(product.id);
+     Alert.alert("Produto deletado", "O produto foi removido com sucesso.");
+     } catch(error) {
+      console.error(error)
+       Alert.alert("Erro", "Erro ao deletar produto.");
+     } 
+   };
+
+   const confirmDeleteProduct = () => {
+     Alert.alert(
+       "Confirmar Exclusão",
+       "Tem certeza de que deseja deletar este produto?",
+       [
+         { text: "Cancelar", style: "cancel" }, 
+         {
+           text: "Deletar",
+           style: "destructive", 
+           onPress: () => handleDeleteProduct(product.id), 
+         },
+       ],
+       { cancelable: true }
+     );
+   };
 
   const handleSaveButtonPress = async () => {
     try {
@@ -172,7 +198,7 @@ const ProductDetailsScreen = () => {
           <PrimaryButton text={"Salvar"} onPress={handleSaveButtonPress} />
           <PrimaryButton
             text={"Deletar"}
-            onPress={handleDeleteButtonPress}
+            onPress={confirmDeleteProduct}
             style={styles.deleteButtonStyle}
             textStyle={styles.deleteButtonTextStyle}
           />
