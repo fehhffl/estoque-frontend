@@ -12,12 +12,13 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
+import { ProductMovementsScreen } from "../screens/ProductMovementsScreen";
 type RootParamList = {
   LoginScreen: undefined;
   RegisterScreen: undefined;
   ProductListScreen: undefined;
   ProductDetailsScreen: { product: Product };
+  ProductMovementsScreen: { product: Product };
 };
 
 type RootNavigationProps = NativeStackNavigationProp<
@@ -101,6 +102,14 @@ const RootStackNavigator = () => {
         options={{
           ...defaultScreenOptions,
           headerTitle: "Detalhes do Produto",
+        }}
+      />
+      <Stack.Screen
+        name={"ProductMovementsScreen"}
+        component={ProductMovementsScreen}
+        options={{
+          ...defaultScreenOptions,
+          headerTitle: "Movimentações do Produto",
         }}
       />
     </Stack.Navigator>

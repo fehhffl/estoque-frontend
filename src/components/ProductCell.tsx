@@ -1,4 +1,11 @@
-import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { Product } from "../models/Product";
 import { EXPO_BASE_URL } from "@env";
 
@@ -8,12 +15,14 @@ type ProductCellProps = {
 };
 
 const ProductCell = ({ product, onPress }: ProductCellProps) => {
+  const { width: screenWidth } = Dimensions.get("window");
+
   return (
     <TouchableOpacity
       onPress={() => {
         onPress(product);
       }}
-      style={styles.container}
+      style={[styles.container, { width: screenWidth - 48 }]}
     >
       <Image
         style={styles.imageStyle}

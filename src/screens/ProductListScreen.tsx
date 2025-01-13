@@ -13,7 +13,7 @@ import { commonStyles } from "../styles/commonStyles";
 
 const ProductListScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const navigation = useNavigation<RootNavigationProps>();
+  const navigation = useNavigation<RootNavigationProps>();  
   const isFocused = useIsFocused();
 
   async function loadData() {
@@ -32,7 +32,7 @@ const ProductListScreen = () => {
   );
 
   const handleProductPress = (product: Product) => {
-    navigation.navigate("ProductDetailsScreen", { product });
+    navigation.navigate("ProductMovementsScreen", { product });
   };
 
   return (
