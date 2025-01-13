@@ -17,7 +17,7 @@ type RootParamList = {
   LoginScreen: undefined;
   RegisterScreen: undefined;
   ProductListScreen: undefined;
-  ProductDetailsScreen: { product: Product };
+  ProductDetailsScreen: { product?: Product };
   ProductMovementsScreen: { product: Product };
 };
 

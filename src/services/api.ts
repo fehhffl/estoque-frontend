@@ -25,12 +25,25 @@ const getProducts = () => {
 };
 
 const deleteProduct = (productId: string) => {
-  return api.delete(`/products/${productId}`)
-}
+  return api.delete(`/products/${productId}`);
+};
 
 const updateProductInfo = (product: Product) => {
   const body = product;
   return api.put(`/products/${product.id}`, JSON.stringify(body));
+};
+
+// retorna o product id do produto inserido.
+const createProduct = async (
+  name: string,
+  description: string,
+  value: number,
+  quantity: number
+): Promise<number> => {
+  const body = { name, description, value, quantity };
+  const response = await api.post("/products/create", JSON.stringify(body));
+  console.log(response);
+  return response.data?.productId;
 };
 
 const updateProductImage = (productId: string, image: string) => {
@@ -65,4 +78,5 @@ export {
   updateProductImage,
   getProductImage,
   deleteProduct,
+  createProduct,
 };

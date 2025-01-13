@@ -18,7 +18,11 @@ import { useRef, useState } from "react";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { updateProductImage, updateProductInfo } from "../services/api";
+import {
+  createProduct,
+  updateProductImage,
+  updateProductInfo,
+} from "../services/api";
 import { EXPO_BASE_URL } from "@env";
 import { isAxiosError } from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -27,12 +31,12 @@ import { deleteProduct } from "../services/api";
 const ProductDetailsScreen = () => {
   const navigation = useNavigation<RootNavigationProps>();
   const route = useRoute<RouteProp<RootParamList, "ProductDetailsScreen">>();
-  const { product } = route.params;
+  const product = route.params?.product;
   const [imageBase64FromImgPicker, setImageBase64FromImgPicker] = useState<
     string | null
   >(null); // Quando a imagem foi escolhida do dispositivo
-  const [productName, setProductName] = useState(product.name);
-  const [description, setDescription] = useState(product.description);
+  const [productName, setProductName] = useState(product?.name);
+  const [description, setDescription] = useState(product?.description);
   const hasChangedImage = useRef(false);
   const productNameInputRef = useRef<TextInput>(null);
   const descriptionInputRef = useRef<TextInput>(null);
@@ -59,7 +63,10 @@ const ProductDetailsScreen = () => {
     }
   };
 
-  const handleDeleteProduct = async (productId: string) => {
+  const handleDeleteProduct = async () => {
+    if (product?.id === undefined) {
+      return;
+    }
     try {
       // Deleta o produto no backend.
       await deleteProduct(product.id);
@@ -83,7 +90,7 @@ const ProductDetailsScreen = () => {
         {
           text: "Deletar",
           style: "destructive",
-          onPress: () => handleDeleteProduct(product.id),
+          onPress: handleDeleteProduct,
         },
       ],
       { cancelable: true }
@@ -91,6 +98,39 @@ const ProductDetailsScreen = () => {
   };
 
   const handleSaveButtonPress = async () => {
+    // Se product nao tem id, significa que ele nao existe, entao estamos criando.
+    if (product?.id === undefined) {
+      handleProductCreation();
+    } else {
+      handleProductUpdate();
+    }
+  };
+
+  const handleProductCreation = async () => {
+    if (!productName || !description) {
+      Alert.alert("Erro", "Nao aceitamos campos vazios, tente novamente.");
+      return;
+    }
+    try {
+      const productId = await createProduct(productName, description, 0, 0);
+      if (imageBase64FromImgPicker) {
+        await updateProductImage(
+          productId.toString(),
+          imageBase64FromImgPicker
+        );
+      }
+      Alert.alert("Sucesso", "Produto criado com sucesso.");
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Erro ao criar produto.");
+    }
+  };
+
+  const handleProductUpdate = async () => {
+    if (product?.id === undefined || !productName || !description) {
+      Alert.alert("Erro", "Nao aceitamos campos vazios, tente novamente.");
+      return;
+    }
     try {
       // Atualiza a imagem primeiro, caso tenha sido alterada,
       // para que se der erro, não atualiza as informações do produto ainda
@@ -156,7 +196,7 @@ const ProductDetailsScreen = () => {
               <Image
                 style={styles.imageStyle}
                 source={{
-                  uri: `${EXPO_BASE_URL}/products/${product.id}/image`,
+                  uri: `${EXPO_BASE_URL}/products/${product?.id}/image`,
                 }}
               />
             )}
@@ -196,7 +236,9 @@ const ProductDetailsScreen = () => {
           {/* Valor */}
 
           {/* Quantidade */}
-          <Text style={styles.staticText}>Quantidade: {product.quantity}</Text>
+          <Text style={styles.staticText}>
+            Quantidade: {product?.quantity ?? 0}
+          </Text>
         </View>
         <View style={styles.sectionStyle}>
           <PrimaryButton text={"Salvar"} onPress={handleSaveButtonPress} />
