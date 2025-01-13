@@ -13,20 +13,21 @@ import { MaterialIcons } from "@expo/vector-icons";
 type ProductCellASimplifiedProps = {
   product: Product;
   onPress: (product: Product) => void;
+  currentQuantity: number;
 };
 
 const ProductCellASimplified = ({
   product,
   onPress,
+  currentQuantity,
 }: ProductCellASimplifiedProps) => {
-  const { width: screenWidth } = Dimensions.get("window");
 
   return (
     <TouchableOpacity
       onPress={() => {
         onPress(product);
       }}
-      style={[styles.container, { width: screenWidth - 48 }]}
+      style={styles.container}
     >
       <View style={styles.contentView}>
         <Image
@@ -39,7 +40,7 @@ const ProductCellASimplified = ({
         />
         <View style={styles.textContainer}>
           <Text style={styles.tittleText}>{product.name} </Text>
-          <Text>Estoque Atual: {product.quantity}</Text>
+          <Text>Estoque Atual: {currentQuantity}</Text>
         </View>
       </View>
       <View>

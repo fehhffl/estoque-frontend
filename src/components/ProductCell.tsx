@@ -1,11 +1,4 @@
-import {
-  View,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
+import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Product } from "../models/Product";
 import { EXPO_BASE_URL } from "@env";
 
@@ -15,14 +8,12 @@ type ProductCellProps = {
 };
 
 const ProductCell = ({ product, onPress }: ProductCellProps) => {
-  const { width: screenWidth } = Dimensions.get("window");
-
   return (
     <TouchableOpacity
       onPress={() => {
         onPress(product);
       }}
-      style={[styles.container, { width: screenWidth - 48 }]}
+      style={styles.container}
     >
       <Image
         style={styles.imageStyle}
@@ -51,6 +42,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 24,
     gap: 8,
+    width: "100%",
   },
   textContainer: {
     gap: 8,
