@@ -1,4 +1,11 @@
-import { FlatList, SafeAreaView, TouchableOpacity, StyleSheet, View, Modal } from "react-native";
+import {
+  FlatList,
+  SafeAreaView,
+  TouchableOpacity,
+  StyleSheet,
+  View,
+  Modal,
+} from "react-native";
 import { ProductCell } from "../components/ProductCell";
 import { Product } from "../models/Product";
 import { getProducts } from "../services/api";
@@ -15,13 +22,17 @@ import { ProductDetailsScreen } from "./ProductDetailsScreen";
 
 const ProductListScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const navigation = useNavigation<RootNavigationProps>();  
+  const navigation = useNavigation<RootNavigationProps>();
   const isFocused = useIsFocused();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   async function loadData() {
     const { data } = await getProducts();
     setProducts(data);
+  }
+
+  const dismissModal = () => {
+    setIsModalVisible(false)
   }
 
   // Recarrega os produtos toda vez que volta pra tela
@@ -39,14 +50,14 @@ const ProductListScreen = () => {
   };
 
   const handleAddProductButtonPress = () => {
-    setIsModalVisible(true)
-
-  }
+    setIsModalVisible(true);
+  };
 
   return (
     <SafeAreaView style={commonStyles.safeAreaStyle}>
       <View style={styles.container}>
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={products}
           renderItem={({ item }) => {
             return <ProductCell product={item} onPress={handleProductPress} />;
@@ -65,11 +76,12 @@ const ProductListScreen = () => {
         visible={isModalVisible}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => {
-          setIsModalVisible(false);
-        }}
+        onRequestClose={dismissModal}
       >
-        <ProductDetailsScreen />
+        <ProductDetailsScreen onCloseRequested = {() => {
+          dismissModal()
+          loadData()
+        }} />
       </Modal>
     </SafeAreaView>
   );
@@ -90,8 +102,8 @@ const styles = StyleSheet.create({
   },
   container: {
     ...commonStyles.container,
-    position: "relative"
-  }
+    position: "relative",
+  },
 });
 
 export { ProductListScreen };

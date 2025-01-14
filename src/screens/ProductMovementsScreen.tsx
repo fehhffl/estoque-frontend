@@ -20,6 +20,7 @@ import { FlatList } from "react-native";
 import { HistoryCell } from "../components/HistoryCell";
 import { useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { updateProductInfo } from "../services/api";
 
 type History = {
   quantityDelta: number;
@@ -90,7 +91,7 @@ const ProductMovementsScreen = () => {
         "Erro",
         "Você não pode registrar uma saída maior que seu estoque."
       );
-      
+
       return;
     }
 
@@ -109,6 +110,7 @@ const ProductMovementsScreen = () => {
     setHistory(updatedHistory);
     setCurrentQuantity(updatedQuantity);
     saveHistory(updatedHistory);
+    updateProductInfo({ ...product, quantity: updatedQuantity });
 
     setInputQuantity("");
     setModalVisible(false);

@@ -1,6 +1,7 @@
 import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Product } from "../models/Product";
 import { EXPO_BASE_URL } from "@env";
+import { toBRL } from "../utils/formatters";
 
 type ProductCellProps = {
   product: Product;
@@ -26,7 +27,8 @@ const ProductCell = ({ product, onPress }: ProductCellProps) => {
       <View style={styles.textContainer}>
         <Text>{product.name} </Text>
         <Text>{product.description}</Text>
-        <Text>{product.quantity}</Text>
+        <Text>Estoque: {product.quantity}</Text>
+        <Text>R$: {toBRL(product.value)}</Text>
       </View>
     </TouchableOpacity>
   );

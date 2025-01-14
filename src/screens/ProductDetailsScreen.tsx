@@ -2,7 +2,6 @@ import {
   SafeAreaView,
   StyleSheet,
   Image,
-  Text,
   TextInput,
   View,
   TouchableOpacity,
@@ -28,7 +27,13 @@ import { isAxiosError } from "axios";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { deleteProduct } from "../services/api";
 
-const ProductDetailsScreen = () => {
+type ProductDetailsScreenProps = {
+  onCloseRequested?: () => void;
+};
+
+const ProductDetailsScreen = ({
+  onCloseRequested,
+}: ProductDetailsScreenProps) => {
   const navigation = useNavigation<RootNavigationProps>();
   const route = useRoute<RouteProp<RootParamList, "ProductDetailsScreen">>();
   const product = route.params?.product;
@@ -37,9 +42,11 @@ const ProductDetailsScreen = () => {
   >(null); // Quando a imagem foi escolhida do dispositivo
   const [productName, setProductName] = useState(product?.name);
   const [description, setDescription] = useState(product?.description);
+  const [productValue, setProductValue] = useState(product?.value.toString() || "");
   const hasChangedImage = useRef(false);
   const productNameInputRef = useRef<TextInput>(null);
   const descriptionInputRef = useRef<TextInput>(null);
+  const isCreation = product?.id === undefined; // Se product nao tem id, significa que ele nao existe, entao estamos criando.
 
   const handlePickImage = async () => {
     try {
@@ -98,8 +105,7 @@ const ProductDetailsScreen = () => {
   };
 
   const handleSaveButtonPress = async () => {
-    // Se product nao tem id, significa que ele nao existe, entao estamos criando.
-    if (product?.id === undefined) {
+    if (isCreation) {
       handleProductCreation();
     } else {
       handleProductUpdate();
@@ -107,27 +113,53 @@ const ProductDetailsScreen = () => {
   };
 
   const handleProductCreation = async () => {
-    if (!productName || !description) {
+    if (!productName || !description || !productValue) {
       Alert.alert("Erro", "Nao aceitamos campos vazios, tente novamente.");
       return;
     }
+    let productId: number | undefined;
     try {
-      const productId = await createProduct(productName, description, 0, 0);
+      productId = await createProduct(
+        productName,
+        description,
+        parseFloat(productValue),
+        0
+      );
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Erro ao criar produto.");
+    }
+    if (!productId) {
+      // impede que se crie uma imagem sem um productId.
+      return;
+    }
+
+    try {
       if (imageBase64FromImgPicker) {
         await updateProductImage(
           productId.toString(),
           imageBase64FromImgPicker
         );
       }
-      Alert.alert("Sucesso", "Produto criado com sucesso.");
+      Alert.alert("Sucesso", "Produto criado com sucesso."); // garante que o produto e a imagem foram criadas.
+      onCloseRequested?.();
     } catch (error) {
       console.error(error);
-      Alert.alert("Erro", "Erro ao criar produto.");
+      if (isAxiosError(error) && error.response?.status === 413) {
+        // 413 = Dados enviados muito grandes
+        Alert.alert(
+          "Erro",
+          "Imagem muito grande. Por favor, escolha uma menor (10 MB max)."
+        );
+      } else {
+        Alert.alert("Erro", "Erro ao salvar imagem do produto.");
+      }
+      deleteProduct(productId.toString()); // Rollback: deleta o produto criado sem foto pra evitar duplicaçoes
     }
   };
 
   const handleProductUpdate = async () => {
-    if (product?.id === undefined || !productName || !description) {
+    if (product?.id === undefined || !productName || !description || !productValue) {
       Alert.alert("Erro", "Nao aceitamos campos vazios, tente novamente.");
       return;
     }
@@ -142,12 +174,12 @@ const ProductDetailsScreen = () => {
         id: product.id,
         name: productName,
         description,
-        value: product.value,
+        value: parseFloat(productValue),
         quantity: product.quantity,
       });
 
       Alert.alert("Produto atualizado com sucesso!");
-      navigation.goBack();
+      navigation.popToTop()
     } catch (error) {
       console.error(error);
 
@@ -234,17 +266,31 @@ const ProductDetailsScreen = () => {
           </TouchableOpacity>
 
           {/* Valor */}
-
-          {/* Quantidade */}
-          <Text style={styles.staticText}>
-            Quantidade: {product?.quantity ?? 0}
-          </Text>
+          <TouchableOpacity
+            style={styles.textInputContainerStyle}
+            onPress={focusProductNameInput}
+          >
+            <TextInput
+              ref={productNameInputRef}
+              style={styles.productNameInputStyle}
+              value={productValue}
+              keyboardType="numeric"
+              onChangeText={setProductValue}
+              placeholder="RS: 00,00"
+            />
+            <MaterialIcons name={"edit"} size={24} color="gray" />
+          </TouchableOpacity>
         </View>
         <View style={styles.sectionStyle}>
-          <PrimaryButton text={"Salvar"} onPress={handleSaveButtonPress} />
           <PrimaryButton
-            text={"Deletar"}
-            onPress={confirmDeleteProduct}
+            text={isCreation ? "Criar" : "Salvar"}
+            onPress={handleSaveButtonPress}
+          />
+          <PrimaryButton
+            text={isCreation ? "Cancelar" : "Deletar"}
+            onPress={() => {
+              return isCreation ? onCloseRequested?.() : confirmDeleteProduct();
+            }}
             style={styles.deleteButtonStyle}
             textStyle={styles.deleteButtonTextStyle}
           />

@@ -3,7 +3,6 @@ import * as FileSystem from "expo-file-system";
 import { EXPO_BASE_URL } from "@env";
 import { Product } from "../models/Product";
 
-console.log(EXPO_BASE_URL);
 
 const api = axios.create({
   baseURL: EXPO_BASE_URL,
@@ -30,6 +29,7 @@ const deleteProduct = (productId: string) => {
 
 const updateProductInfo = (product: Product) => {
   const body = product;
+  console.log(body)
   return api.put(`/products/${product.id}`, JSON.stringify(body));
 };
 
@@ -42,7 +42,6 @@ const createProduct = async (
 ): Promise<number> => {
   const body = { name, description, value, quantity };
   const response = await api.post("/products/create", JSON.stringify(body));
-  console.log(response);
   return response.data?.productId;
 };
 
