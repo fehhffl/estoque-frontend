@@ -26,18 +26,6 @@ type History = {
   quantityDelta: number;
   quantityAfterOperation: number;
 };
-const history: History[] = [
-  { quantityDelta: 10, quantityAfterOperation: 20 },
-  { quantityDelta: -5, quantityAfterOperation: 15 },
-  { quantityDelta: 10, quantityAfterOperation: 25 },
-  { quantityDelta: -6, quantityAfterOperation: 19 },
-  { quantityDelta: 1, quantityAfterOperation: 20 },
-  { quantityDelta: 0, quantityAfterOperation: 20 },
-  { quantityDelta: -5, quantityAfterOperation: 15 },
-  { quantityDelta: 10, quantityAfterOperation: 25 },
-  { quantityDelta: -6, quantityAfterOperation: 19 },
-  { quantityDelta: 1, quantityAfterOperation: 20 },
-];
 
 const ProductMovementsScreen = () => {
   const route = useRoute<RouteProp<RootParamList, "ProductMovementsScreen">>();

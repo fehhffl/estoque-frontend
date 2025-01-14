@@ -25,7 +25,16 @@ const LoginScreen = () => {
   const navigation = useNavigation<RootNavigationProps>();
 
   const handleLoginButtonPress = async () => {
-    // TODO: Validar email e senha
+    if (!email || !password) {
+      Alert.alert("Erro", "Preencha todos os campos.");
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Erro", "A senha deve ter no mínimo 6 caracteres.");
+      return;
+    }
+
     try {
       await login(email, password);
       await AsyncStorage.setItem("login", email); // salva local o usuário logado, para que na proxima vez nao precisa logar dnv.

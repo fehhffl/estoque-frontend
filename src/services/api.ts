@@ -1,8 +1,6 @@
 import axios from "axios";
-import * as FileSystem from "expo-file-system";
 import { EXPO_BASE_URL } from "@env";
 import { Product } from "../models/Product";
-
 
 const api = axios.create({
   baseURL: EXPO_BASE_URL,
@@ -29,7 +27,6 @@ const deleteProduct = (productId: string) => {
 
 const updateProductInfo = (product: Product) => {
   const body = product;
-  console.log(body)
   return api.put(`/products/${product.id}`, JSON.stringify(body));
 };
 
@@ -50,32 +47,12 @@ const updateProductImage = (productId: string, image: string) => {
   return api.put(`/products/${productId}/image`, JSON.stringify(body));
 };
 
-const getProductImage = async (productId: string) => {
-  const fileUri = `${FileSystem.cacheDirectory}${productId}.jpg`;
-
-  // Verifica se o arquivo já foi baixado
-  const fileInfo = await FileSystem.getInfoAsync(fileUri);
-
-  if (fileInfo.exists) {
-    return fileUri; // Retorna o caminho local se o arquivo já existe
-  }
-
-  // Faz o download da imagem do servidor
-  const response = await FileSystem.downloadAsync(
-    `${EXPO_BASE_URL}/products/${productId}/image`,
-    fileUri
-  );
-
-  return response.uri;
-};
-
 export {
   login,
   register,
   getProducts,
   updateProductInfo,
   updateProductImage,
-  getProductImage,
   deleteProduct,
   createProduct,
 };

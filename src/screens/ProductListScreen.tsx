@@ -32,8 +32,8 @@ const ProductListScreen = () => {
   }
 
   const dismissModal = () => {
-    setIsModalVisible(false)
-  }
+    setIsModalVisible(false);
+  };
 
   // Recarrega os produtos toda vez que volta pra tela
   useFocusEffect(
@@ -78,10 +78,12 @@ const ProductListScreen = () => {
         transparent={true}
         onRequestClose={dismissModal}
       >
-        <ProductDetailsScreen onCloseRequested = {() => {
-          dismissModal()
-          loadData()
-        }} />
+        <ProductDetailsScreen
+          onCloseRequested={() => {
+            dismissModal();
+            loadData();
+          }}
+        />
       </Modal>
     </SafeAreaView>
   );
@@ -99,9 +101,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 24,
     bottom: 24,
+    backgroundColor: "white",
   },
   container: {
-    ...commonStyles.container,
     position: "relative",
   },
 });

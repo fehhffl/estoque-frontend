@@ -15,11 +15,13 @@ import { register } from "../services/api";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { isAxiosError } from "axios";
 
 const RegisterScreen = () => {
   const navigation = useNavigation<RootNavigationProps>();
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("")
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [isPasswordSecured, setIsPasswordSecured] = useState(true);
@@ -33,38 +35,52 @@ const RegisterScreen = () => {
       return;
     }
 
+    if (password.length < 6) {
+      Alert.alert("Erro", "A senha deve ter no mínimo 6 caracteres.");
+      return;
+    }
+
     if (password !== passwordConfirm) {
       setError("As senhas não estão coincidindo.");
       return;
     }
 
-    setError(""); 
+    setError("");
     try {
       await register(username, email, password);
-     navigation.navigate("LoginScreen");
-    } catch(error) {
-      console.error("Erro ao registrar usuario", error);
-      Alert.alert("Erro", "Não foi possível registrar usuario.");
+      // Salva local o usuário logado, para que na próxima vez não precise logar novamente
+      await AsyncStorage.setItem("login", email);
+
+      // Navega sem a possibilidade de voltar para a tela de login
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "ProductListScreen" }],
+      });
+    } catch (error) {
+      console.error(error);
+
+      if (isAxiosError(error) && error.response?.status === 409) {
+        Alert.alert("Erro", "Email já está cadastrado a uma conta.");
+        return;
+      }
+
+      Alert.alert("Erro", "Erro ao fazer registro.");
     }
-    
-    
   };
 
   return (
     <SafeAreaView style={commonStyles.safeAreaStyle}>
       <KeyboardAwareScrollView
-        style={[commonStyles.container]}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={commonStyles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.InputFieldsView}>
+        <View style={styles.inputFieldsContainerStyle}>
           <Text style={styles.titleText}> Registro </Text>
           <TextInput
             onChangeText={setUsername}
             style={styles.textInput}
             placeholder="Nome de Usuário"
             value={username}
-            autoCapitalize={"none"}
           />
           <TextInput
             onChangeText={setEmail}
@@ -123,7 +139,7 @@ const RegisterScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  InputFieldsView: {
+  inputFieldsContainerStyle: {
     padding: 24,
     gap: 24,
     flex: 1,

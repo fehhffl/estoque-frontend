@@ -42,7 +42,9 @@ const ProductDetailsScreen = ({
   >(null); // Quando a imagem foi escolhida do dispositivo
   const [productName, setProductName] = useState(product?.name);
   const [description, setDescription] = useState(product?.description);
-  const [productValue, setProductValue] = useState(product?.value.toString() || "");
+  const [productValue, setProductValue] = useState(
+    product?.value.toString() || ""
+  );
   const hasChangedImage = useRef(false);
   const productNameInputRef = useRef<TextInput>(null);
   const descriptionInputRef = useRef<TextInput>(null);
@@ -159,7 +161,12 @@ const ProductDetailsScreen = ({
   };
 
   const handleProductUpdate = async () => {
-    if (product?.id === undefined || !productName || !description || !productValue) {
+    if (
+      product?.id === undefined ||
+      !productName ||
+      !description ||
+      !productValue
+    ) {
       Alert.alert("Erro", "Nao aceitamos campos vazios, tente novamente.");
       return;
     }
@@ -179,7 +186,7 @@ const ProductDetailsScreen = ({
       });
 
       Alert.alert("Produto atualizado com sucesso!");
-      navigation.popToTop()
+      navigation.popToTop();
     } catch (error) {
       console.error(error);
 
