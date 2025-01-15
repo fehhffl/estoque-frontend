@@ -5,6 +5,7 @@ import {
   StyleSheet,
   View,
   Modal,
+  Text,
 } from "react-native";
 import { ProductCell } from "../components/ProductCell";
 import { Product } from "../models/Product";
@@ -56,14 +57,27 @@ const ProductListScreen = () => {
   return (
     <SafeAreaView style={commonStyles.safeAreaStyle}>
       <View style={styles.container}>
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={products}
-          renderItem={({ item }) => {
-            return <ProductCell product={item} onPress={handleProductPress} />;
-          }}
-          keyExtractor={(item) => item.id}
-        />
+        {products.length === 0 ? (
+          <View style={styles.emptyStateContainer}>
+            <Text style={styles.emptyStateTextTop}>
+              Não há produtos cadastrados.
+            </Text>
+            <Text style={styles.emptyStateTextBottom}>
+              Clique no botão de adicionar para adicionar um produto.
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={products}
+            renderItem={({ item }) => {
+              return (
+                <ProductCell product={item} onPress={handleProductPress} />
+              );
+            }}
+            keyExtractor={(item) => item.id}
+          />
+        )}
         <TouchableOpacity
           style={styles.buttonStyle}
           onPress={handleAddProductButtonPress}
@@ -105,6 +119,22 @@ const styles = StyleSheet.create({
   },
   container: {
     position: "relative",
+    flex: 1,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+    gap: 4,
+  },
+  emptyStateTextTop: {
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  emptyStateTextBottom: {
+    textAlign: "center",
   },
 });
 

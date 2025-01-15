@@ -251,6 +251,7 @@ const ProductDetailsScreen = ({
               style={styles.productNameInputStyle}
               value={productName}
               onChangeText={setProductName}
+              placeholderTextColor={"#888888"}
               placeholder="Nome do Produto"
             />
             <MaterialIcons name={"edit"} size={24} color="gray" />
@@ -266,6 +267,7 @@ const ProductDetailsScreen = ({
               style={styles.textInputStyle}
               value={description}
               onChangeText={setDescription}
+              placeholderTextColor={"#888888"}
               placeholder="Descrição do Produto"
               multiline
             />
@@ -282,6 +284,7 @@ const ProductDetailsScreen = ({
               style={styles.productNameInputStyle}
               value={productValue}
               keyboardType="numeric"
+              placeholderTextColor={"#888888"}
               onChangeText={setProductValue}
               placeholder="RS: 00,00"
             />
